@@ -74,10 +74,23 @@ $(document).ready(function () {
         $("#diagram").droppable({
             drop: function (event, ui) {
                 var id = `${ui.draggable[0].id}_${index}`;
+                var values = ["100", "200", "300", "400"];
+                var select = $('<select>').prop('id', id)
+                                .prop('name', 'select').css({"margin-left": "5px", "margin-top":"10px"});
+        
+                $(values).each(function() {
+                    select.append($("<option>")
+                    .prop('value', this)
+                    .text(this.charAt(0).toUpperCase() + this.slice(1)));
+                });
+                var br = $("<br>");
                 var clone = $(ui.helper).clone(true);
                 index++;
                 clone.attr("id", id);
                 clone.appendTo(this);
+                clone.append(select).append(br);
+                clone.css({"background-color":"rgb(0, 138, 230)","color": "white", "margin-left": "5px", "margin-top":"5px"});
+
                 instance.draggable(id, { containment: true });
                 instance.addEndpoint(id, {
                     endpoint: "Dot",
