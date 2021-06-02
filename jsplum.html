@@ -1,0 +1,362 @@
+
+
+  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jsPlumb demo</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+          integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+          crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.5/js/jsplumb.min.js" integrity="sha512-PjminIGk9jefzK8KKri4U44KYMW4C4WZNTY/4dB33FwkoY5pSF7GL+ZIvz8t61QsY5h30gfWZ0IJ4h/yQVoRyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+          integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <style>
+      #diagram, #toolbox {
+          margin: 20px 0;
+          border-width: 2px;
+          border-style: solid;
+          border-color: lightgrey;
+          height: 90vh;
+      }
+
+      #toolbox {
+          display: flex;
+          padding: 10px;
+          flex-flow: row wrap;
+          align-content: flex-start;
+      }
+
+      .control {
+          border-color: green;
+          border-radius: 10px;
+          border-width: 2px;
+          border-style: solid;
+          width: 150px;
+          text-align: center;
+          cursor: move;
+          height: 50px;
+          height: -moz-max-content;
+          background-color: white;
+      }
+
+      #diagram .control {
+          position: absolute;
+      }
+
+      .window {
+          z-index: 20;
+      }
+
+      .jtk-connector {
+          z-index: 4;
+      }
+
+      .jtk-endpoint {
+          z-index: 5;
+      }
+
+      .jtk-overlay {
+          z-index: 6;
+      }
+
+      .custom-menu {
+          z-index: 1000;
+          position: absolute;
+          background-color: #C0C0C0;
+          border: 1px solid black;
+          padding: 2px;
+      }
+
+      #toolbox .control {
+          margin: 10px 5px;
+      }
+
+      .btn{
+        height: 50px;
+        width: 150px;
+        border: 0px;
+        background-color: rgb(0, 138, 230);
+        color: white;
+        margin-left: 400px;
+        margin-top: 450px;
+       
+        box-shadow: 0 10px 40px 0 #B0C1D9;
+      }
+     
+  </style>
+
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3">
+      <div id="toolbox" class="justify-content-center">
+       
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div id="diagram" style="height: 90vh; position: relative">
+        <button class="btn" onclick="saveNodeJson()">Save Connections</button>
+        <button id="btnSave" >Save</button>
+        <button id="btnLoad"  >Load</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+  const box = $("#toolbox");
+  nodenames = [
+            {id: 'Node1', name: 'Wrk2', icon:'fa-weebly' },
+            {id: 'Node2', name: 'Nginx',  icon:'fa-neos'},
+            {id: 'Node3', name: 'Wordpress', icon:'fa-wordpress'},
+            {id: 'Node4', name: 'StaticServer', icon:'fa-server'},
+            {id: 'Node5', name: 'MySQL',  icon:'fa-database'},
+  ]
+  console.log(nodenames)
+for(i=0; i<nodenames.length; i++){
+  
+
+                    
+  var control = document.createElement("div");
+  control.innerHTML= nodenames[i].name;
+  control.classList.add('control');
+
+  var icon = document.createElement("i");
+  iconclass = nodenames[i].icon;
+ 
+  icon.classList.add("fab", "fa-weebly");
+
+  box.append(control)
+  control.append(icon)
+ 
+}
+
+  var values = ["100", "200", "300", "400"];
+    
+    var select = $('<select>').prop('id', 'select')
+                    .prop('name', 'select').css({"margin-left": "5px", "margin-top":"10px"});
+
+    $(values).each(function() {
+        select.append($("<option>")
+        .prop('value', this)
+        .text(this.charAt(0).toUpperCase() + this.slice(1)));
+    });
+    var br = $("<br>");
+
+ 
+
+
+
+
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  instance = jsPlumb.getInstance({});
+
+  
+  function saveNodeJson(){
+    //const container = $("#diagram")
+    const controls = $("#diagram > .control");
+    var nodes = $("#diagram > .control").map(function() {
+               return {
+                          id: this.id,
+                        }
+               }).get();
+
+    var connections = [];
+    const connection =     $.each(instance.getConnections(), function (id, connection) {
+                          connections.push({
+                            connectionId: connection.id,
+                            SourceId: connection.sourceId,
+                            x: parseInt(connection.css("left"), 10),
+                            y: parseInt(connection.css("top"), 10),
+                            TargetId: connection.targetId,
+                        
+                          })
+                        })
+                        const json = JSON.stringify({ nodes, connections });
+                        console.log(json)
+
+  }
+
+  $('#btnSave').on('click', function() {
+      data = [];
+      // Loop through elements (b is block)
+      var b = []
+      $("#diagram .control").each(function (idx, elem) {
+          var $elem = $(elem);
+          b.push({
+              id: $elem.attr('id'),
+              x: parseInt($elem.css("left"), 10),
+              y: parseInt($elem.css("top"), 10),
+              h: $elem.html()
+          });
+      });
+      console.log("b",b)
+      data.push({blk : b});
+      // Loop through connections
+      var c = [];
+      $.each(instance.getConnections(), function (idx, connection) {
+          c.push({
+              i: connection.id,
+              s: connection.sourceId,
+              t: connection.targetId
+          });
+      });
+
+      data.push({con : c});
+
+     data = JSON.stringify(data);
+      console.log("data1",data)
+
+      // Lastly, save the data somewhere (e.g. MySQL, etc.)
+
+});
+
+$('#btnLoad').on('click', function() {      
+
+
+// First, retrieve the data from storage (e.g. MySQL, etc.)
+
+      data = JSON.parse(data);                        
+      var blk = data[0].blk;
+      var con = data[1].con;
+      console.log("data2",data)
+      for( var i = 0; i < blk.length; i++ ) {             
+        addWidget(blk[i]['id'],blk[i]['x'],blk[i]['y'], blk[i]['h']);           
+      }
+
+      for( var i = 0; i < con.length; i++ ) {
+
+          var connection = instance.connect({ source: con[i]['s'], target: con[i]['t'] });
+
+          // Allows user to click to remove connection
+          connection.bind("click", function(conn) {
+              instance.deleteConnection(conn);
+          });
+      }
+
+      // Make the loaded elements draggable again
+      instance.draggable( $('.control') );
+});
+
+
+
+  
+  instance.setContainer("diagram");
+  instance.bind("ready", function () {
+    instance.registerConnectionTypes({
+      "red-connection": {
+        paintStyle: {stroke: "red", strokeWidth: 5},
+        hoverPaintStyle: {stroke: "red", strokeWidth: 10},
+        connector: "Flowchart"
+      }
+    });
+   
+
+    instance.bind("contextmenu", function (component, event) {
+      if (component.hasClass("jtk-connector")) {
+        event.preventDefault();
+        window.selectedConnection = component;
+        $("<div class='custom-menu'><button class='delete-connection'>Delete connection</button></div>")
+          .appendTo("body")
+          .css({top: event.pageY + "px", left: event.pageX + "px"});
+      }
+    });
+    $("body").on("click", ".delete-connection", function (event) {
+      instance.deleteConnection(window.selectedConnection);
+    });
+
+    $(document).bind("click", function (event) {
+      $("div.custom-menu").remove();
+    });
+
+    $("body").on("contextmenu", "#diagram .control", function (event) {
+      event.preventDefault();
+      window.selectedControl = $(this).attr("id");
+      $("<div class='custom-menu'><button class='delete-control'>Delete control</button></div>")
+        .appendTo("body")
+        .css({top: event.pageY + "px", left: event.pageX + "px"});
+    });
+
+    $("body").on("click", ".delete-control", function (event) {
+      instance.remove(window.selectedControl);
+    });
+
+    $("#toolbox .control").draggable({
+      helper: "clone",
+      containment: "body",
+      appendTo: "#diagram",
+     
+    });
+
+    $("#diagram").droppable({
+      drop: function(event, ui) {
+      
+        var id = uuidv4();
+        var clone = $(ui.helper).clone(true);
+        clone.attr("id", id);
+        
+        clone.appendTo(this);
+        clone.append(select).append(br);
+        clone.css({"background-color":"rgb(0, 138, 230)","color": "white", "margin-left": "5px", "margin-top":"5px"});
+
+        
+
+        
+
+        instance.draggable(id, {containment: true});
+        
+        instance.addEndpoint(id, {
+          endpoint: "Dot",
+          anchor: ["RightMiddle"],
+          isSource: true,
+          connectionType: "red-connection",
+          maxConnections: -1,
+        });
+
+        instance.addEndpoint(id, {
+          endpoint: "Dot",
+          anchor: ["LeftMiddle"],
+          isTarget: true,
+          connectionType: "red-connection",
+          maxConnections: -1,
+        });
+
+        
+      }
+
+     
+    });
+    
+    
+  });
+  
+</script>
+</body>
+</html>
